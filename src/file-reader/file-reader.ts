@@ -11,11 +11,11 @@ export default class TSVFileReader implements FileReader {
 
   constructor(public filename: string) {}
 
-  read() {
+  public read() {
     this.data = readFileSync(this.filename, "utf-8");
   }
 
-  parseData(): OfferType[] {
+  public parseData(): OfferType[] {
     const offers = this.data?.split("\n").filter((row) => row.trim() !== "");
     const offersRows = offers?.map((row) => row.split("\t"));
 
