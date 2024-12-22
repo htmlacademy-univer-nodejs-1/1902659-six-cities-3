@@ -1,4 +1,4 @@
-export enum City {
+enum City {
   Paris,
   Cologne,
   Brussels,
@@ -6,3 +6,5 @@ export enum City {
   Hamburg,
   Dusseldorf,
 }
+
+export default City;

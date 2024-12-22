@@ -6,7 +6,7 @@ import {
   getRandomItems,
 } from "../utils/random.js";
 import { OfferGeneratorInterface } from "./offer-generators.interface";
-import { City } from "../types/city.enum";
+import City from "../types/city.enum";
 import { House } from "../types/house.enum";
 import { Facilities } from "../types/facilities.enum";
 import { User } from "../types/user.enum";
