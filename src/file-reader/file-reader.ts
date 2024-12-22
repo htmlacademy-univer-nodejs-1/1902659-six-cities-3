@@ -1,78 +1,34 @@
-import { readFileSync } from "node:fs";
-import { OfferType } from "../types/offer.type.js";
-import { City } from "../types/city.enum.js";
-import { House } from "../types/house.enum.js";
-import { Facilities } from "../types/facilities.enum.js";
-import { User } from "../types/user.enum.js";
+import { createReadStream, readFileSync } from "node:fs";
 import { FileReader } from "./file-reader.interface.js";
+import { EventEmitter } from "node:stream";
 
-export default class TSVFileReader implements FileReader {
-  private data = " ";
-
-  constructor(public filename: string) {}
-
-  public read() {
-    this.data = readFileSync(this.filename, "utf-8");
+export default class TSVFileReader extends EventEmitter implements FileReader {
+  constructor(public filename: string) {
+    super();
   }
 
-  public parseData(): OfferType[] {
-    const offers = this.data?.split("\n").filter((row) => row.trim() !== "");
-    const offersRows = offers?.map((row) => row.split("\t"));
+  public async read(): Promise<void> {
+    const stream = createReadStream(this.filename, {
+      highWaterMark: 2 ** 16,
+      encoding: "utf-8",
+    });
 
-    return offersRows.map(
-      ([
-        name,
-        description,
-        publicationDate,
-        city,
-        previewImage,
-        images,
-        premium,
-        favorite,
-        rating,
-        housingType,
-        roomCount,
-        guestCount,
-        facilities,
-        offerAuthorName,
-        offerAuthorAvatar,
-        offerAuthorType,
-        offerAuthorEmail,
-        offerAuthorPassword,
-        commentsCount,
-        latitude,
-        longitude,
-        price,
-      ]) => ({
-        name: name,
-        description: description,
-        publicationDate: new Date(publicationDate),
-        city: city as unknown as City,
-        previewImage: previewImage,
-        iamges: images.split(","),
-        premium: premium as unknown as boolean,
-        favorite: favorite as unknown as boolean,
-        rating: parseFloat(rating),
-        housingType: housingType as unknown as House,
-        roomCount: parseInt(roomCount, 10),
-        guestCount: parseInt(guestCount, 10),
-        price: parseInt(price, 10),
-        facilities: facilities
-          .split(",")
-          .map((facility) => facility as unknown as Facilities),
-        offerAuthor: {
-          username: offerAuthorName,
-          email: offerAuthorEmail,
-          avatar: offerAuthorAvatar,
-          password: offerAuthorPassword,
-          type: offerAuthorType as unknown as User,
-        },
-        commentsCount: parseInt(commentsCount, 10),
-        coordinates: {
-          latitude: parseFloat(latitude),
-          longitude: parseFloat(longitude),
-        },
-      })
-    );
+    let data = "";
+    let nextLine = -1;
+    let rowCount = 0;
+
+    for await (const chunk of stream) {
+      data += chunk.toString();
+
+      while ((nextLine = data.indexOf("\n")) >= 0) {
+        const completeRow = data.slice(0, nextLine + 1);
+        data = data.slice(++nextLine);
+        rowCount++;
+
+        this.emit("row", completeRow);
+      }
+    }
+
+    this.emit("end", rowCount);
   }
 }

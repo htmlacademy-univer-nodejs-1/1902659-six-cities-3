@@ -17,7 +17,7 @@ export type OfferType = {
   housingType: House;
   roomCount: number;
   guestCount: number;
-  price: number;
+  cost: number;
   facilities: Facilities[];
   offerAuthor: UserType;
   commentsCount: number;
