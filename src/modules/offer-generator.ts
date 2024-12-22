@@ -1,15 +1,15 @@
 import dayjs from "dayjs";
-import { MockData } from "../types/mock-data.type";
+import { MockData } from "../types/mock-data.type.js";
 import {
   generateRandomValue,
   getRandomItem,
   getRandomItems,
 } from "../utils/random.js";
-import { OfferGeneratorInterface } from "./offer-generators.interface";
-import { City } from "../types/city.enum";
-import { House } from "../types/house.enum";
-import { Facilities } from "../types/facilities.enum";
-import { User } from "../types/user.enum";
+import { OfferGeneratorInterface } from "./offer-generators.interface.js";
+import { City } from "../types/city.enum.js";
+import { House } from "../types/house.enum.js";
+import { Facilities } from "../types/facilities.enum.js";
+import { User } from "../types/user.enum.js";
 
 const MIN_COST = 100;
 const MAX_COST = 100000;
