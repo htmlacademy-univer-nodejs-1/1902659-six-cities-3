@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    "resolveJsonModule": true,
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "declaration": true,
     "strict": true,
     "noImplicitAny": true,
@@ -21,11 +20,13 @@
     "sourceMap": true,
     "outDir": "./dist",
     "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
     "types": [
       "node",
     ],
     "lib": [
-      "ESNext"
+      "ESNext",
+      "dom"
     ]
   },
   "include": [
