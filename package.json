@@ -43,6 +43,7 @@
     "inversify": "^6.2.1",
     "nvm": "^0.0.4",
     "pino": "^9.6.0",
+    "reflect-metadata": "^0.2.2",
     "tslib": "^2.8.1"
   }
 }
