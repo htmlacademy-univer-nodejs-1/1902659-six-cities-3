@@ -4,7 +4,6 @@ import mongoose, { Mongoose } from "mongoose";
 import { Component } from "../types/component.enum.js";
 import { Logger } from "../logger/logger.interface.js";
 import { setTimeout } from "node:timers/promises";
-import { P } from "pino";
 
 const RETRY_COUNT = 5;
 const RETRY_TIMEOUT = 1000;

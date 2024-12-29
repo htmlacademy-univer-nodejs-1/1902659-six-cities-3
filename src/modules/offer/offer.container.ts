@@ -14,4 +14,6 @@ export function createOfferContainer() {
   offerConatiner
     .bind<types.ModelType<OfferEntity>>(Component.OfferModel)
     .toConstantValue(OfferModel);
+
+  return offerConatiner;
 }
