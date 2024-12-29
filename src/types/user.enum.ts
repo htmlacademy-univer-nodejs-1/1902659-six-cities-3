@@ -1,4 +1,4 @@
 export enum User {
-  simple,
-  pro,
+  simple = "simple",
+  pro = "pro",
 }
