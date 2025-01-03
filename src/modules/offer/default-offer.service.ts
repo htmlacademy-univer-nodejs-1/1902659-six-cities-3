@@ -1,13 +1,13 @@
 import { inject, injectable } from "inversify";
-import { OfferService } from "./offer-service.interface.js";
-import { Component } from "../../types/component.enum.js";
-import { Logger } from "../../logger/logger.interface.js";
 import { DocumentType, types } from "@typegoose/typegoose";
-import { OfferEntity } from "./offer.entity.js";
 import CreateOfferDto from "./dto/create-offer.dto.js";
+import { OfferEntity } from "./offer.entity.js";
+import { OfferService } from "./offer-service.interface.js";
+import { Logger } from "../../logger/logger.interface.js";
+import { Component } from "../../types/component.enum.js";
 import UpdateOfferDto from "./dto/update-offer.dto.js";
-import { DEFAULT_OFFER_COUNT } from "./offer.constant.js";
 import { Sort } from "../../types/sort-type.emum.js";
+import { DEFAULT_OFFER_COUNT } from "./offer.constant.js";
 
 @injectable()
 export default class DefaultOfferService implements OfferService {
@@ -19,7 +19,7 @@ export default class DefaultOfferService implements OfferService {
 
   public async create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>> {
     const result = await this.offerModel.create(dto);
-    this.logger.info(`Новый офер создан ${dto.name}`);
+    this.logger.info(`New offer created: ${dto.name}`);
     return result;
   }
 
@@ -76,13 +76,6 @@ export default class DefaultOfferService implements OfferService {
   public async getPremium(): Promise<DocumentType<OfferEntity>[]> {
     return this.offerModel
       .find({ flagIsPremium: true })
-      .populate("offerId")
-      .exec();
-  }
-
-  public async getFavorite(): Promise<DocumentType<OfferEntity>[]> {
-    return this.offerModel
-      .find({ flagIsFavourites: true })
       .populate("offerId")
       .exec();
   }
