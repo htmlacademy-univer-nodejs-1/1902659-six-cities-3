@@ -1,10 +1,11 @@
+import { DocumentType, types } from "@typegoose/typegoose";
 import { inject, injectable } from "inversify";
+import { UserEntity } from "./user.entity.js";
+import CreateUserDto from "./dto/create-user.dto.js";
 import { UserService } from "./user-service.interface.js";
 import { Component } from "../../types/component.enum.js";
-import { Logger } from "pino";
-import { UserEntity } from "./user.entity.js";
-import { DocumentType, types } from "@typegoose/typegoose";
-import CreateUserDto from "./dto/create-user.dto.js";
+import { Logger } from "../../logger/logger.interface.js";
+import { OfferEntity } from "../offer/offer.entity.js";
 
 @injectable()
 export default class DefaultUserService implements UserService {
@@ -22,7 +23,7 @@ export default class DefaultUserService implements UserService {
     user.setPassword(dto.password, salt);
 
     const result = await this.userModel.create(user);
-    this.logger.info(`Новый пользователь создан ${user.email}`);
+    this.logger.info(`New user created: ${user.email}`);
 
     return result;
   }
@@ -44,5 +45,20 @@ export default class DefaultUserService implements UserService {
     }
 
     return this.create(dto, salt);
+  }
+
+  public async findFavoriteOffers(
+    userId: string
+  ): Promise<DocumentType<OfferEntity>[]> {
+    const offersFavorite = await this.userModel
+      .findById(userId)
+      .select("favorite")
+      .exec();
+
+    if (offersFavorite === null) {
+      return [];
+    }
+
+    return this.userModel.find({ _id: { $in: offersFavorite.favoriteOffers } });
   }
 }

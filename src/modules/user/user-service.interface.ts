@@ -1,6 +1,7 @@
 import { DocumentType } from "@typegoose/typegoose";
 import CreateUserDto from "./dto/create-user.dto.js";
 import { UserEntity } from "./user.entity.js";
+import { OfferEntity } from "../offer/offer.entity.js";
 
 export interface UserService {
   create(dto: CreateUserDto, salt: string): Promise<DocumentType<UserEntity>>;
@@ -9,4 +10,5 @@ export interface UserService {
     dto: CreateUserDto,
     salt: string
   ): Promise<DocumentType<UserEntity>>;
+  findFavoriteOffers(userId: string): Promise<DocumentType<OfferEntity>[]>;
 }
