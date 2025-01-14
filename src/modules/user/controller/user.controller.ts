@@ -12,6 +12,8 @@ import { UserService } from "../user-service.interface.js";
 import { UserRdo } from "../rdo/user.rdo.js";
 import { HttpError } from "../../../errors/http-errors.js";
 import { fillDTO } from "../../../utils/fillDTO.js";
+import { ValidateObjectIdMiddleware } from "../../../middleware/validate-objectId.middleware.js";
+import { UploadFileMiddleware } from "../../../middleware/upload-file.middleware.js";
 
 @injectable()
 export class UserController extends BaseController {
@@ -31,6 +33,18 @@ export class UserController extends BaseController {
       path: "/login",
       method: HttpMethod.Post,
       handler: this.login,
+    });
+    this.addRoute({
+      path: "/:userId/avatar",
+      method: HttpMethod.Post,
+      handler: this.uploadAvatar,
+      middlewares: [
+        new ValidateObjectIdMiddleware("userId"),
+        new UploadFileMiddleware(
+          this.configService.get("UPLOAD_DIRECTORY"),
+          "avatar"
+        ),
+      ],
     });
   }
 
@@ -78,5 +92,11 @@ export class UserController extends BaseController {
       "Not implemented",
       "UserController"
     );
+  }
+
+  public async uploadAvatar(req: Request, res: Response) {
+    this.created(res, {
+      filepath: req.file?.path,
+    });
   }
 }
