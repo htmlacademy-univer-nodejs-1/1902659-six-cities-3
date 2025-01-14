@@ -16,6 +16,7 @@ import { CommentRdo } from "../../comment/rdo/comment.rdo.js";
 import { ValidateObjectIdMiddleware } from "../../../middleware/validate-objectId.middleware.js";
 import { ValidateDtoMiddleware } from "../../../middleware/validate-dto.middleware.js";
 import { CommentService } from "../../comment/comment-service.interface.js";
+import { DocumentExistsMiddleware } from "../../../middleware/document-exists.middleware.js";
 
 @injectable()
 export default class OfferController extends BaseController {
@@ -41,13 +42,19 @@ export default class OfferController extends BaseController {
       path: "/:offerId",
       method: HttpMethod.Get,
       handler: this.show,
-      middlewares: [new ValidateObjectIdMiddleware("offerId")],
+      middlewares: [
+        new ValidateObjectIdMiddleware("offerId"),
+        new DocumentExistsMiddleware(this.offersService, "Offer", "offerId"),
+      ],
     });
     this.addRoute({
       path: "/:offerId",
       method: HttpMethod.Delete,
       handler: this.delete,
-      middlewares: [new ValidateObjectIdMiddleware("offerId")],
+      middlewares: [
+        new ValidateObjectIdMiddleware("offerId"),
+        new DocumentExistsMiddleware(this.offersService, "Offer", "offerId"),
+      ],
     });
     this.addRoute({
       path: "/:offerId",
@@ -56,6 +63,7 @@ export default class OfferController extends BaseController {
       middlewares: [
         new ValidateObjectIdMiddleware("offerId"),
         new ValidateDtoMiddleware(UpdateOfferDto),
+        new DocumentExistsMiddleware(this.offersService, "Offer", "offerId"),
       ],
     });
     this.addRoute({
