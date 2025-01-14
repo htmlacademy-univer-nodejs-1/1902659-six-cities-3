@@ -19,6 +19,8 @@ export abstract class BaseController implements Controller {
   }
 
   public addRoute(this: BaseController, route: Route) {
+    const routeHandler = asyncHandler(route.handler.bind(this));
+    const middlewares = route.
     this._router[route.method](
       route.path,
       asyncHandler(route.handler.bind(this))
