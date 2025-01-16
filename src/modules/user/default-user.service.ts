@@ -6,6 +6,7 @@ import { UserService } from "./user-service.interface.js";
 import { Component } from "../../types/component.enum.js";
 import { Logger } from "../../logger/logger.interface.js";
 import { OfferEntity } from "../offer/offer.entity.js";
+import LoginUserDto from "./dto/login-user.dto.js";
 
 @injectable()
 export default class DefaultUserService implements UserService {
@@ -26,6 +27,20 @@ export default class DefaultUserService implements UserService {
     this.logger.info(`New user created: ${user.email}`);
 
     return result;
+  }
+
+  public async verifyUser(
+    dto: LoginUserDto,
+    salt: string
+  ): Promise<DocumentType<UserEntity> | null> {
+    const user = await this.findByEmail(dto.email);
+    if (!user) {
+      return null;
+    }
+    if (user.verifyPassword(dto.password, salt)) {
+      return user;
+    }
+    return null;
   }
 
   public async findByEmail(

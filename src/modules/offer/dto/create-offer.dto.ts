@@ -3,7 +3,6 @@ import {
   IsBoolean,
   IsDateString,
   IsInt,
-  IsMongoId,
   IsNumber,
   IsObject,
   IsString,
@@ -66,8 +65,7 @@ export default class CreateOfferDto {
   @IsString({ message: CreateOfferMessages.conveniences.invalidFormat })
     conveniences!: Facilities;
 
-  @IsMongoId({ message: CreateOfferMessages.author.invalidId })
-    author!: User;
+  author!: User;
 
   countComments!: number;
 
