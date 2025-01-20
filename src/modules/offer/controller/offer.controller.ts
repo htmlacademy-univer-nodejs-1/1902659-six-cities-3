@@ -18,6 +18,7 @@ import { ValidateDtoMiddleware } from "../../../middleware/validate-dto.middlewa
 import { CommentService } from "../../comment/comment-service.interface.js";
 import { DocumentExistsMiddleware } from "../../../middleware/document-exists.middleware.js";
 import { PrivateRouteMiddleware } from "../../../middleware/private-root.middleware.js";
+import { UnknownRecord } from "../../../types/unknown-record.type.js";
 
 @injectable()
 export default class OfferController extends BaseController {
@@ -88,17 +89,13 @@ export default class OfferController extends BaseController {
   }
 
   public async create(
-    {
-      body,
-      user,
-    }: Request<
-      Record<string, unknown>,
-      Record<string, unknown>,
-      CreateOfferDto
-    >,
+    { body, user }: Request<UnknownRecord, UnknownRecord, CreateOfferDto>,
     res: Response
   ): Promise<void> {
-    const result = await this.offersService.create({ ...body, user: user });
+    const result = await this.offersService.create({
+      ...body,
+      userId: user.id,
+    });
 
     this.created(res, fillDTO(OfferRdo, result));
   }
@@ -110,20 +107,12 @@ export default class OfferController extends BaseController {
     const { offerId } = params;
     const offer = await this.offersService.deleteById(offerId);
 
-    if (!offer) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Offer with id ${offerId} not found.`,
-        "OfferController"
-      );
-    }
-
     await this.commentService.deleteByOfferId(offerId);
     this.noContent(res, offer);
   }
 
   public async update(
-    { body, params }: Request<ParamOfferId, unknown, UpdateOfferDto>,
+    { body, params }: Request<ParamOfferId, UnknownRecord, UpdateOfferDto>,
     res: Response
   ): Promise<void> {
     const updatedOffer = await this.offersService.updateById(
@@ -131,38 +120,25 @@ export default class OfferController extends BaseController {
       body
     );
 
-    if (!updatedOffer) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Offer with id ${params.offerId} not found.`,
-        "OfferController"
-      );
-    }
-
     this.ok(res, fillDTO(OfferRdo, updatedOffer));
   }
 
-  public async show(_req: Request, _res: Response): Promise<void> {
-    throw new HttpError(
-      StatusCodes.NOT_IMPLEMENTED,
-      "Not implemented",
-      "OfferController"
-    );
-  }
-
-  public async getComments(
+  public async show(
     { params }: Request<ParamOfferId>,
     res: Response
   ): Promise<void> {
-    if (!(await this.offersService.exists(params.offerId))) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Offer with id ${params.offerId} not found.`,
-        "OfferController"
-      );
-    }
+    const { offerId } = params;
+    const offer = await this.offersService.findById(offerId);
 
+    this.ok(res, fillDTO(OfferRdo, offer));
+  }
+
+  public async getComments(
+    { params }: Request<ParamOfferId, UnknownRecord, UnknownRecord>,
+    res: Response
+  ): Promise<void> {
     const comments = await this.commentService.findByOfferId(params.offerId);
+
     this.ok(res, fillDTO(CommentRdo, comments));
   }
 }

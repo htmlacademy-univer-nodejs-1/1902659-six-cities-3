@@ -18,6 +18,7 @@ import { createJWT } from "../../../utils/createJWT.js";
 import LoginUserDto from "../dto/login-user.dto.js";
 import { JWT_ALGORITHM } from "../user.constant.js";
 import LoggedUserRdo from "../rdo/logged-user.rdo.js";
+import { UnknownRecord } from "../../../types/unknown-record.type.js";
 
 @injectable()
 export class UserController extends BaseController {
@@ -81,10 +82,8 @@ export class UserController extends BaseController {
   }
 
   public async login(
-    {
-      body,
-    }: Request<Record<string, unknown>, Record<string, unknown>, LoginUserDto>,
-    _res: Response
+    { body }: Request<UnknownRecord, UnknownRecord, LoginUserDto>,
+    res: Response
   ): Promise<void> {
     const user = await this.userService.verifyUser(
       body,
@@ -109,7 +108,7 @@ export class UserController extends BaseController {
     );
 
     this.ok(
-      _res,
+      res,
       fillDTO(LoggedUserRdo, {
         email: user.email,
         token,

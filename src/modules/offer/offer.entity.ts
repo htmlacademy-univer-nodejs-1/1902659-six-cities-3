@@ -1,13 +1,12 @@
 import typegoose, {
   defaultClasses,
   getModelForClass,
+  Ref,
 } from "@typegoose/typegoose";
-import { OfferType } from "../../types/offer.type.js";
 import { City } from "../../types/city.enum.js";
 import { House } from "../../types/house.enum.js";
 import { Facilities } from "../../types/facilities.enum.js";
 import { UserEntity } from "../user/user.entity.js";
-import { User } from "../../types/user.type.js";
 import { Coordinates } from "../../types/coordinates.type.js";
 
 const { prop, modelOptions } = typegoose;
@@ -22,7 +21,7 @@ export interface OfferEntity extends defaultClasses.Base {}
 })
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export class OfferEntity extends defaultClasses.TimeStamps implements OfferType {
+export class OfferEntity extends defaultClasses.TimeStamps {
   @prop({
     required: true,
     minlength: [10, "Min length for name is 10"],
@@ -38,7 +37,7 @@ export class OfferEntity extends defaultClasses.TimeStamps implements OfferType 
   public description!: string;
 
   @prop({ required: true })
-  public publicationDate!: Date;
+  public date!: Date;
 
   @prop({
     required: true,
@@ -48,19 +47,19 @@ export class OfferEntity extends defaultClasses.TimeStamps implements OfferType 
   public city!: City;
 
   @prop({ required: true })
-  public previewImage!: string;
+  public previewImg!: string;
 
   @prop({
     required: true,
     type: () => String,
   })
-  public iamges!: string[];
+  public images!: string[];
 
   @prop({ required: true })
-  public premium!: boolean;
+  public flagIsPremium!: boolean;
 
   @prop({ required: true })
-  public favorite!: boolean;
+  public flagIsFavourites!: boolean;
 
   @prop({ required: true })
   public rating!: 1 | 2 | 3 | 4 | 5;
@@ -70,36 +69,36 @@ export class OfferEntity extends defaultClasses.TimeStamps implements OfferType 
     type: () => String,
     enum: House,
   })
-  public housingType!: House;
+  public housing!: House;
 
   @prop({ required: true })
-  public roomCount!: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  public countRooms!: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
   @prop({ required: true })
-  public guestCount!: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+  public countPeople!: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
   @prop({
     required: true,
     min: [100, "Min length for price is 100"],
     max: [100000, "Min length for price is 100000"],
   })
-  public cost!: number;
+  public price!: number;
 
   @prop({
     required: true,
     type: () => String,
     enum: Facilities,
   })
-  public facilities!: Facilities;
+  public conveniences!: Facilities;
 
   @prop({
     required: true,
     ref: UserEntity,
   })
-  public offerAuthor!: User;
+  public userId!: Ref<UserEntity>;
 
   @prop({ default: 0 })
-  public commentsCount!: number;
+  public countComments!: number;
 
   @prop({
     required: true,

@@ -1,4 +1,4 @@
-export enum User {
+export enum UserEnum {
   simple = "simple",
   pro = "pro",
 }
