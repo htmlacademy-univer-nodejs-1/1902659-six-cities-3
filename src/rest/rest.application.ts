@@ -9,6 +9,7 @@ import { ExceptionFilter } from "../exception-filters/exception-filters.interfac
 import { BaseController } from "../controller/base-controller.js";
 import express, { Express } from "express";
 import { AuthenticateMiddleware } from "../middleware/authenticate.middleware.js";
+import cors from "cors";
 
 @injectable()
 export default class Application {
@@ -19,20 +20,26 @@ export default class Application {
     @inject(Component.Config) private readonly config: Config<RestSchema>,
     @inject(Component.DatabaseClient)
     private readonly databaseClient: DatabaseClient,
-    @inject(Component.AppExceptionFilter)
-    private readonly exceptionFilter: ExceptionFilter,
+    @inject(Component.HttpErrorExceptionFilter)
+    private readonly httpErrorExceptionFilter: ExceptionFilter,
     @inject(Component.UserController)
     private readonly userController: BaseController,
     @inject(Component.OfferController)
     private readonly offerController: BaseController,
     @inject(Component.CommentController)
-    private readonly commentController: BaseController
+    private readonly commentController: BaseController,
+    @inject(Component.BaseExceptionFilter)
+    private readonly baseExceptionFilter: ExceptionFilter,
+    @inject(Component.ValidationExceptionFilter)
+    private readonly validationExceptionFilter: ExceptionFilter
   ) {
     this.server = express();
   }
 
   private async _initDb() {
-    const mongoUrl = getMongoURI(
+    this.logger.info("Init database");
+
+    const mongoUri = getMongoURI(
       this.config.get("DB_USER"),
       this.config.get("DB_PASSWORD"),
       this.config.get("DB_HOST"),
@@ -40,7 +47,9 @@ export default class Application {
       this.config.get("DB_NAME")
     );
 
-    return this.databaseClient.connect(mongoUrl);
+    this.logger.info("Init database completed");
+
+    return this.databaseClient.connect(mongoUri);
   }
 
   private async _initServer() {
@@ -79,6 +88,7 @@ export default class Application {
     this.server.use(
       authenticateMiddleware.execute.bind(authenticateMiddleware)
     );
+    this.server.use(cors());
 
     this.logger.info("Middleware init completed");
   }
@@ -86,13 +96,21 @@ export default class Application {
   private async _initExceptionFilters() {
     this.logger.info("Init exception filters");
 
-    this.server.use(this.exceptionFilter.catch.bind(this.exceptionFilter));
+    this.server.use(
+      this.validationExceptionFilter.catch.bind(this.validationExceptionFilter)
+    );
+    this.server.use(
+      this.httpErrorExceptionFilter.catch.bind(this.httpErrorExceptionFilter)
+    );
+    this.server.use(
+      this.baseExceptionFilter.catch.bind(this.baseExceptionFilter)
+    );
 
     this.logger.info("Exception filters completed");
   }
 
   public async init() {
-    this.logger.info("Init application");
+    this.logger.info("Application init");
 
     await this._initDb();
     await this._initMiddleware();
